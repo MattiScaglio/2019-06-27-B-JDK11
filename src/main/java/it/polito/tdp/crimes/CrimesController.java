@@ -7,7 +7,9 @@ package it.polito.tdp.crimes;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.crimes.db.Adiacenza;
 import it.polito.tdp.crimes.model.Model;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -25,10 +27,10 @@ public class CrimesController {
     private URL location;
 
     @FXML // fx:id="boxCategoria"
-    private ComboBox<?> boxCategoria; // Value injected by FXMLLoader
+    private ComboBox<String> boxCategoria; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxMese"
-    private ComboBox<?> boxMese; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalisi"
     private Button btnAnalisi; // Value injected by FXMLLoader
@@ -44,8 +46,21 @@ public class CrimesController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-    	txtResult.clear();
-    	txtResult.appendText("Crea grafo...\n");
+    	
+    	String categoria = boxCategoria.getValue();
+    	int mese = boxMese.getValue();
+    	this.model.CreaGrafo(mese, categoria);
+    	
+    	txtResult.appendText("#VERTICI: "+this.model.nVertici()+"\n");
+    	txtResult.appendText("#ARCHI: "+this.model.nArchi()+"\n");
+    	
+
+    	txtResult.appendText("MEDIA PESO DELLA CATEGORIA "+categoria+" NEL MESE "+mese+": "+this.model.getMediaPesoArchi(categoria, mese)+"\n");
+    	for(Adiacenza a : this.model.getArchiSopraMedia(categoria,mese)) {
+    		txtResult.appendText(a.getE1()+" con "+a.getE2()+" con peso: "+ a.getPeso()+"\n");
+    	}
+
+
     }
     
     @FXML
@@ -67,5 +82,15 @@ public class CrimesController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	for(String g: this.model.getVettore()) {
+        	boxCategoria.getItems().add(g);
+    	}
+    	
+    	for(Integer m: this.model.getVettoreMesi()) {
+        	boxMese.getItems().add(m);
+    	}
+    	
+    	
     }
 }
